@@ -66,10 +66,13 @@ func NewReceiver(r *redis.Client, queue string) *Receiver {
 }
 func (a *Receiver) proc() {
 	for {
+		time.Sleep(time.Millisecond * 100)
 		data, err := a.redis.RPop(context.TODO(), a.queue).Result()
+		if errors.Is(err, redis.Nil) {
+			continue
+		}
 		if err != nil || len(data) == 0 {
 			log.Warn("RPop error", "err", err)
-			time.Sleep(time.Millisecond * 100)
 			continue
 		}
 		select {
