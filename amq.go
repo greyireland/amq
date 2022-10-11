@@ -67,7 +67,8 @@ func NewReceiver(r *redis.Client, queue string) *Receiver {
 func (a *Receiver) proc() {
 	for {
 		time.Sleep(time.Millisecond * 100)
-		data, err := a.redis.RPop(context.TODO(), a.queue).Result()
+
+		data, err := a.redis.BRPop(context.TODO(), time.Second, a.queue).Result()
 		if errors.Is(err, redis.Nil) {
 			continue
 		}
@@ -76,7 +77,7 @@ func (a *Receiver) proc() {
 			continue
 		}
 		select {
-		case a.ch <- data:
+		case a.ch <- data[0]:
 		case <-time.After(time.Millisecond * 100):
 			log.Warn("drop data", "data", data)
 		}
