@@ -77,7 +77,7 @@ func (a *Receiver) proc() {
 			continue
 		}
 		select {
-		case a.ch <- data[0]:
+		case a.ch <- data[1]:
 		case <-time.After(time.Millisecond * 100):
 			log.Warn("drop data", "data", data)
 		}
